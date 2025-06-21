@@ -4,115 +4,130 @@ using UnityEngine;
 
 public class TetrominoMovement : MonoBehaviour
 {
-    [SerializeField] float movePos = 1; // 좌우 아래 이동간격
-    [SerializeField] float downRate = 1; //아래 이동 시간 간격
-    public bool isMove = true;
-    public GameObject SpawnP;
+    
+    private float previousTime;
+    public float fallTime = 1.0f;                // Inspector에서 조절
+    public static int height = 25;
+    public static int width = 10;
+    public Vector3 rotationPoint;                // 회전 중심점 (Inspector에서 세팅)
 
-    IEnumerator mDownCol;
-    ROTATION rot = ROTATION.ROT0;
-    [SerializeField] Vector2[] rotPos; //각도 보정치
-
-    Transform block;
+    private static Transform[,] grid = new Transform[width, height];
 
     void Start()
     {
-        block = transform.GetChild(0);
-        MoveY();
+        // 초기화 로직 필요 시 여기에
     }
 
     void Update()
     {
-        if (!isMove) return;
-        InputK();
-    }
-
-    void InputK()
-    {
-        if (Input.GetKeyDown(KeyCode.LeftArrow)) MoveX(-1);
-        else if (Input.GetKeyDown(KeyCode.UpArrow)) Rotation();
-        else if (Input.GetKeyDown(KeyCode.RightArrow)) MoveX(+1);
-        else if (Input.GetKeyDown(KeyCode.DownArrow)) MoveY();
-        else if (Input.GetKeyDown(KeyCode.Space)) HardDrop();
-    }
-
-    void MoveX(float x) //좌우 이동
-    {
-        x = x * movePos;
-        transform.position = new Vector3(transform.position.x + x, transform.position.y, 0);
-    }
-
-    void MoveY() // 키 입력 아래 이동 // 병합했음
-    {
-        transform.position = new Vector3(transform.position.x, transform.position.y - movePos, 0);
-
-        if (mDownCol != null) StopCoroutine(mDownCol);
-
-        mDownCol = MoveDownCor();
-        StartCoroutine(mDownCol);
-    }
-
-    IEnumerator MoveDownCor()
-    {
-        while (isMove)
+        // 좌/우 이동
+        if (Input.GetKeyDown(KeyCode.LeftArrow))
         {
-            yield return new WaitForSeconds(downRate);
-            //MoveDown();
-            MoveY();
+            transform.position += new Vector3(-1, 0, 0);
+            if (!ValidMove())
+                transform.position -= new Vector3(-1, 0, 0);
         }
-    }
-
-    void HardDrop() //gpt
-    {
-        if (!isMove) return;
-
-        // 현재 위치에서 아래로 한 칸씩 내려가며 충돌 확인
-        while (CheckValidPosition(transform.position + Vector3.down * movePos))
+        else if (Input.GetKeyDown(KeyCode.RightArrow))
         {
-            transform.position += Vector3.down * movePos;
+            transform.position += new Vector3(1, 0, 0);
+            if (!ValidMove())
+                transform.position -= new Vector3(1, 0, 0);
+        }
+        // 회전
+        else if (Input.GetKeyDown(KeyCode.UpArrow))
+        {
+            transform.RotateAround(transform.TransformPoint(rotationPoint), Vector3.forward, 90);
+            if (!ValidMove())
+                transform.RotateAround(transform.TransformPoint(rotationPoint), Vector3.forward, -90);
         }
 
-        // 이후 자동 하강 멈추고, 고정 처리
-        isMove = false;
-        if (mDownCol != null)
-            StopCoroutine(mDownCol);
-    }
-
-    void Rotation()
-    {
-        if (rotPos.Length == 0) return;
-
-        rot++;
-        if (rot > ROTATION.ROT270) rot = ROTATION.ROT0;
-
-        block.localPosition = rotPos[(int)rot % 2];
-
-        block.localRotation = Quaternion.Euler(0, 0, int.Parse(rot.ToString().Substring(3)));
-    }
-
-    public enum ROTATION
-    {
-        ROT0,
-        ROT90,
-        ROT180,
-        ROT270
-    }
-
-    bool CheckValidPosition(Vector3 targetPos) // gpt
-    {
-        // 블록의 자식들(작은 블록 4개)에 대해 각각 충돌 확인
-        foreach (Transform child in block)
+        // 아래로 자동 이동 (DownArrow 누르면 빠르게)
+        if (Time.time - previousTime > (Input.GetKey(KeyCode.DownArrow) ? fallTime / 10 : fallTime))
         {
-            Vector3 childTargetPos = targetPos + (child.position - transform.position);
-            Collider2D hit = Physics2D.OverlapBox(childTargetPos, Vector2.one * 0.9f, 0);
+            transform.position += new Vector3(0, -1, 0);
 
-            if (hit != null && hit.transform.parent != transform)
+            if (!ValidMove())
             {
-                return false; // 다른 블록과 충돌
+                transform.position -= new Vector3(0, -1, 0);
+                AddToGrid();                                     // 그리드에 추가
+                this.enabled = false;                            // 이 블록 비활성화
+                FindObjectOfType<spawnertetris>().NewTetris();   // 새 블록 소환
+                CheckForLines();                                 // 라인 체크 및 제거
             }
-        }
 
+            previousTime = Time.time;
+        }
+    }
+
+    // 유효한 위치인지 검사
+    bool ValidMove()
+    {
+        foreach (Transform child in transform)
+        {
+            int x = Mathf.RoundToInt(child.position.x);
+            int y = Mathf.RoundToInt(child.position.y);
+
+            if (x < 0 || x >= width || y < 0 || y >= height)
+                return false;
+            if (grid[x, y] != null)
+                return false;
+        }
         return true;
     }
 
+    // 그리드에 블록 추가
+    void AddToGrid()
+    {
+        foreach (Transform child in transform)
+        {
+            int x = Mathf.RoundToInt(child.position.x);
+            int y = Mathf.RoundToInt(child.position.y);
+            grid[x, y] = child;
+        }
+    }
+
+    // 꽉 찬 줄 검사 & 제거
+    void CheckForLines()
+    {
+        for (int i = height - 1; i >= 0; i--)
+        {
+            if (HasLine(i))
+            {
+                DeleteLine(i);
+                RowDown(i);
+            }
+        }
+    }
+
+    bool HasLine(int i)
+    {
+        for (int j = 0; j < width; j++)
+            if (grid[j, i] == null) return false;
+        return true;
+    }
+
+    void DeleteLine(int i)
+    {
+        for (int j = 0; j < width; j++)
+        {
+            Destroy(grid[j, i].gameObject);
+            grid[j, i] = null;
+        }
+    }
+
+    void RowDown(int i)
+    {
+        for (int y = i; y < height; y++)
+        {
+            for (int j = 0; j < width; j++)
+            {
+                if (grid[j, y] != null)
+                {
+                    grid[j, y - 1] = grid[j, y];
+                    grid[j, y] = null;
+                    grid[j, y - 1].position -= Vector3.up;
+                }
+            }
+        }
+    }
 }
