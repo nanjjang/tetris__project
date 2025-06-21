@@ -12,9 +12,9 @@ public class TetrominoMovement : MonoBehaviour
 
     private static Transform[,] grid = new Transform[width, height];
 
-    void Start()
+    void Awake()
     {
-        // 초기화 로직 필요 시 여기에
+        //컴퍼넌트 초기화
     }
 
     void Update()
@@ -151,6 +151,7 @@ public class TetrominoMovement : MonoBehaviour
             Destroy(grid[j, i].gameObject);
             grid[j, i] = null;
         }
+        GameManager.Instance.Plus();
     }
 
     void RowDown(int i)
