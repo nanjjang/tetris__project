@@ -7,7 +7,7 @@ public class Button : MonoBehaviour
     public GameObject NamingPannel;
     public void GameStart()
     {
-        SceneManager.LoadScene("InGame");
+        SceneManager.LoadScene("URP2DSceneTemplate");
     }
 
     public void GameExit()
