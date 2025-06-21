@@ -2,44 +2,22 @@ using UnityEngine;
 
 public class Board : MonoBehaviour
 {
-    public static Board i;
-    bool[,] blockArr = new bool[22, 10];
+    public int width = 10;
+    public int height = 20;
+    public Vector2 spawnPosition = new Vector2(5, 19);
+    public static Transform[,] grid;
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Awake()
     {
-        i = this;
+        grid = new Transform[width, height];
     }
 
-    public bool BoardCheckX(Vector2[] p, int x)
+    // (선택) 씬 뷰에 그리드 선 보기
+    void OnDrawGizmos()
     {
-        for (int i = 0; i < p.Length; i++)
-        {
-            if (Mathf.RoundToInt(p[i].x) + x < 0 || Mathf.RoundToInt(p[i].x) + x > blockArr.GetLength(1) - 1 || blockArr[22 - Mathf.RoundToInt(p[i].y), Mathf.RoundToInt(p[i].x) + x] == true)
-            {
-                return false;
-            }
-        }
-        return true;
+        Gizmos.color = Color.gray;
+        for (int x = 0; x < width; x++)
+            for (int y = 0; y < height; y++)
+                Gizmos.DrawWireCube(new Vector3(x, y, 0), Vector3.one);
     }
-
-    public bool BoardCheckY(Vector2[] p)
-    {
-        for (int i = 0; i < p.Length; i++)
-        {
-
-            if (22 - Mathf.RoundToInt(p[i].y) >= blockArr.GetLength(0) - 1 || blockArr[22 - (Mathf.RoundToInt(p[i].y - 1)), Mathf.RoundToInt(p[i].x)] == true)
-            {
-                for (int j = 0; j < p.Length; j++)
-                {
-                    blockArr[22 - (Mathf.RoundToInt(p[i].y)), Mathf.RoundToInt(p[j].x)] = true;
-                }
-
-                return false;
-            }
-        }
-        return true;
-    }
-
-    
 }
