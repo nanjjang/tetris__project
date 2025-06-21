@@ -747,11 +747,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5675370852505567915, guid: d49a1c881bf43a4409ca5d92a7d6a625, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0.28
+      value: -0.5
       objectReference: {fileID: 0}
     - target: {fileID: 5675370852505567915, guid: d49a1c881bf43a4409ca5d92a7d6a625, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 6.17
+      value: 7.45
       objectReference: {fileID: 0}
     - target: {fileID: 5675370852505567915, guid: d49a1c881bf43a4409ca5d92a7d6a625, type: 3}
       propertyPath: m_LocalPosition.z
@@ -1225,7 +1225,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1136242006}
-  - component: {fileID: 1136242005}
   m_Layer: 0
   m_Name: Spawnpoint
   m_TagString: Untagged
@@ -1233,20 +1232,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1136242005
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1136242004}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ec7d7f361226d93429f74f033e2f5911, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  tetrisPrefab: {fileID: 5246883621456857346, guid: 4b7b3220826c00c4c97ebb78f94901fb, type: 3}
-  spawnInterval: 1
 --- !u!4 &1136242006
 Transform:
   m_ObjectHideFlags: 0
@@ -1289,8 +1274,8 @@ Transform:
   m_GameObject: {fileID: 1777354695}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: -1, z: 0}
-  m_LocalScale: {x: 10, y: 20, z: 1}
+  m_LocalPosition: {x: 0.06, y: -2.3, z: 0}
+  m_LocalScale: {x: 8.562, y: 17.124, z: 0.8562}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 734265901}
@@ -1447,9 +1432,5 @@ SceneRoots:
   - {fileID: 1136242006}
   - {fileID: 570948167}
   - {fileID: 328610826}
-<<<<<<< Updated upstream
-=======
-  - {fileID: 52381833}
   - {fileID: 773804520}
   - {fileID: 343228115}
->>>>>>> Stashed changes
