@@ -94,3 +94,35 @@ public class spawnertetris : MonoBehaviour
         // 보관 UI(이미지) 갱신 로직 넣기
     }
 }
+
+    // 홀드 동작
+    public void Hold()
+    {
+        if (!canHold) return;    // 이미 홀드 사용했으면 무시
+        canHold = false;
+
+        // 첫 홀드라면 보관통에 저장 후 새 블록 소환
+        if (holdPrefab == null)
+        {
+            holdPrefab = currentPrefab;
+            Destroy(currentInstance);
+            SpawnNext();
+        }
+        else
+        {
+            // 보관되어 있던 블록과 현재 블록 교체
+            GameObject temp = holdPrefab;
+            holdPrefab = currentPrefab;
+
+            Destroy(currentInstance);
+
+            currentPrefab = temp;
+            currentInstance = Instantiate(currentPrefab, spawnPoint.position, Quaternion.identity);
+            currentInstance.GetComponent<TetrominoMovement>().enabled = true;
+        }
+
+        // (선택) UI 보관 슬롯 갱신
+        UpdateHoldDisplay();
+    }
+
+
