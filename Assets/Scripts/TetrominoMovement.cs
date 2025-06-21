@@ -4,21 +4,10 @@ using UnityEngine;
 
 public class TetrominoMovement : MonoBehaviour
 {
-<<<<<<< Updated upstream
     [SerializeField] float movePos = 1; // 좌우 아래 이동간격
     [SerializeField] float downRate = 1; //아래 이동 시간 간격
-=======
-    [SerializeField] float movePos = 1f; // 좌우 및 아래 이동 단위
-    [SerializeField] float downRate = 1f; // 자동 아래 이동 시간 간격
-    [SerializeField] Vector2[] rotPos = new Vector2[4]; // 0, 90, 180, 270도 회전 보정값
-    [SerializeField] Vector2 pos;
-
-    Vector2 pOffset = new Vector2(-0.5f, 0.5f);
-
->>>>>>> Stashed changes
     public bool isMove = true;
-    public GameObject[] blocks = new GameObject[4];
-    public List<Transform> listB = new List<Transform>();
+    public GameObject SpawnP;
 
     IEnumerator mDownCol;
     ROTATION rot = ROTATION.ROT0;
@@ -28,64 +17,34 @@ public class TetrominoMovement : MonoBehaviour
 
     void Start()
     {
-<<<<<<< Updated upstream
         block = transform.GetChild(0);
         MoveY();
-=======
-        block = transform.GetChild(0); // 자식 오브젝트 (블록) 받아오기
-        mDownCol = MoveDownCor();
-        StartCoroutine(mDownCol);
-
-        for (int i = 0; i < 4; i++)
-            listB.Add(blocks[i].transform);
->>>>>>> Stashed changes
     }
 
     void Update()
     {
         if (!isMove) return;
-        if (Input.GetKeyDown(KeyCode.A)) MoveX(-1);
-<<<<<<< Updated upstream
-        else if (Input.GetKeyDown(KeyCode.W)) Rotation();
-        else if (Input.GetKeyDown(KeyCode.D)) MoveX(+1);
-        else if (Input.GetKeyDown(KeyCode.S)) MoveY();
+        InputK();
+    }
 
-        if (Input.GetKeyDown(KeyCode.Space)) Rotation();
-
+    void InputK()
+    {
+        if (Input.GetKeyDown(KeyCode.LeftArrow)) MoveX(-1);
+        else if (Input.GetKeyDown(KeyCode.UpArrow)) Rotation();
+        else if (Input.GetKeyDown(KeyCode.RightArrow)) MoveX(+1);
+        else if (Input.GetKeyDown(KeyCode.DownArrow)) MoveY();
+        else if (Input.GetKeyDown(KeyCode.Space)) HardDrop();
     }
 
     void MoveX(float x) //좌우 이동
     {
-=======
-        else if (Input.GetKeyDown(KeyCode.D)) MoveX(1);
-        else if (Input.GetKeyDown(KeyCode.W)) Rotation();
-        else if (Input.GetKeyDown(KeyCode.S)) MoveY();
-
-    }
-
-    void MoveX(float x)
-    {
-        Vector2[] p = new Vector2[listB.Count];
-        for (int i = 0; i < p.Length; i++)
-
-        pos.x += x;
->>>>>>> Stashed changes
         x = x * movePos;
         transform.position = new Vector3(transform.position.x + x, transform.position.y, 0);
     }
 
-    void MoveDown() // 아래 이동
+    void MoveY() // 키 입력 아래 이동 // 병합했음
     {
-<<<<<<< Updated upstream
-=======
-        pos.y++;
->>>>>>> Stashed changes
         transform.position = new Vector3(transform.position.x, transform.position.y - movePos, 0);
-    }
-
-    void MoveY() // 키 입력 아래 이동
-    {
-        MoveDown();
 
         if (mDownCol != null) StopCoroutine(mDownCol);
 
@@ -98,8 +57,25 @@ public class TetrominoMovement : MonoBehaviour
         while (isMove)
         {
             yield return new WaitForSeconds(downRate);
-            MoveDown();
+            //MoveDown();
+            MoveY();
         }
+    }
+
+    void HardDrop() //gpt
+    {
+        if (!isMove) return;
+
+        // 현재 위치에서 아래로 한 칸씩 내려가며 충돌 확인
+        while (CheckValidPosition(transform.position + Vector3.down * movePos))
+        {
+            transform.position += Vector3.down * movePos;
+        }
+
+        // 이후 자동 하강 멈추고, 고정 처리
+        isMove = false;
+        if (mDownCol != null)
+            StopCoroutine(mDownCol);
     }
 
     void Rotation()
@@ -109,7 +85,7 @@ public class TetrominoMovement : MonoBehaviour
         rot++;
         if (rot > ROTATION.ROT270) rot = ROTATION.ROT0;
 
-        block.localPosition = rotPos[(int)rot%2];
+        block.localPosition = rotPos[(int)rot % 2];
 
         block.localRotation = Quaternion.Euler(0, 0, int.Parse(rot.ToString().Substring(3)));
     }
@@ -120,6 +96,23 @@ public class TetrominoMovement : MonoBehaviour
         ROT90,
         ROT180,
         ROT270
+    }
+
+    bool CheckValidPosition(Vector3 targetPos) // gpt
+    {
+        // 블록의 자식들(작은 블록 4개)에 대해 각각 충돌 확인
+        foreach (Transform child in block)
+        {
+            Vector3 childTargetPos = targetPos + (child.position - transform.position);
+            Collider2D hit = Physics2D.OverlapBox(childTargetPos, Vector2.one * 0.9f, 0);
+
+            if (hit != null && hit.transform.parent != transform)
+            {
+                return false; // 다른 블록과 충돌
+            }
+        }
+
+        return true;
     }
 
 }
