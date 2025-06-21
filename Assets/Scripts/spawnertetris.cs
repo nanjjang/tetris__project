@@ -14,14 +14,14 @@ public class spawnertetris : MonoBehaviour
     }
 
     public void NewTetris()
-{
-    Vector3 worldPos = new Vector3(5f, 21f, 0f);
-    Instantiate(
-        TetrisPrefabs[Random.Range(0, TetrisPrefabs.Length)],
-        worldPos,
-        Quaternion.identity
-    );
-}
+    {
+        Vector3 worldPos = new Vector3(5f, 21f, 0f);
+        Instantiate(
+            TetrisPrefabs[Random.Range(0, TetrisPrefabs.Length)],
+            worldPos,
+            Quaternion.identity
+        );
+    }
 }
 
 
