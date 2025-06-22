@@ -94,4 +94,10 @@ public class spawnertetris : MonoBehaviour
     {
         // 보관 UI(이미지) 갱신 로직 넣기
     }
+
+    public void ReplaceTetromino(int index, GameObject newPrefab) 
+    {
+        if (index < 0 || index >= tetrominoes.Length) return;
+        tetrominoes[index] = newPrefab;
+    }
 }

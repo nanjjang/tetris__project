@@ -5,10 +5,14 @@ using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
-    public static GameManager Instance; // ½Ì±ÛÅæ
+    public static GameManager Instance; // ï¿½Ì±ï¿½ï¿½ï¿½
 
     public TextMeshProUGUI txt_s;
     public TextMeshProUGUI txt_t;
+
+    [Header("1~7ë‹¨ê³„ ì—…ê·¸ë ˆì´ë“œ í”„ë¦¬íŒ¹")]
+    public GameObject[] upgradePrefabs = new GameObject[7];
+    private int currentLevel = 0; //ë ˆë²¨
 
     //public InputField username;
 
@@ -20,7 +24,7 @@ public class GameManager : MonoBehaviour
 
     void Awake()
     {
-        // ½Ì±ÛÅæ ÃÊ±âÈ­
+        // ï¿½Ì±ï¿½ï¿½ï¿½ ï¿½Ê±ï¿½È­
         if (Instance == null) Instance = this;
         else Destroy(gameObject);
 
@@ -47,22 +51,36 @@ public class GameManager : MonoBehaviour
 
     public void Plus()
     {
-        Userscore += 100f; // Á¡¼ö Áõ°¡
-        Debug.Log("Á¡¼ö: " + Userscore);
-        if (Userscore % 400f == 0)
+        Userscore += 100f;
+        Debug.Log("ìŠ¤ì½”ì–´: " + Userscore);
+
+        int newLevel = Mathf.FloorToInt(Userscore / 1000f); 
+        // í•œ ë ˆë²¨ ì˜¬ë¦´ ë•Œë§Œ ì²˜ë¦¬í•˜ëŠ”ê±°
+        if (newLevel > currentLevel && newLevel >= 1 && newLevel <= upgradePrefabs.Length) //ë ˆë²¨ì¦ê°€ íŒë‹¨í•¨
         {
-            // 1200Á¡¸¶´Ù ·¹º§ ¾÷
-            LevelUp();
+            currentLevel = newLevel;
+            ApplyTetrominoUpgrade(currentLevel - 1);
         }
     }
+
+    private void ApplyTetrominoUpgrade(int tetrominoIndex) //ìƒˆë¡œìš´ í…ŒíŠ¸ë¡œë¯¸ë…¸ë¡œ êµì²´
+    {
+        var spawner = FindObjectOfType<spawnertetris>();
+        if (spawner == null) return;
+
+        GameObject newPrefab = upgradePrefabs[tetrominoIndex];
+        spawner.ReplaceTetromino(tetrominoIndex, newPrefab);
+
+        Debug.Log($"ë ˆë²¨ì—…! { (tetrominoIndex+1)*1000 }ì  ë‹¬ì„±: Tetromino[{tetrominoIndex}]ì„ ìƒˆ í”„ë¦¬íŒ¹ìœ¼ë¡œ êµì²´");
+    }   
 
     void LevelUp()
     {
 
     }
-    //------save data-------//    ½Ã°£ °ü°è»ó ½ÃÇè±â°£ÀÌ±âµµ ÇØ¼­ º¸·ù.
+    //------save data-------//    ï¿½Ã°ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½â°£ï¿½Ì±âµµ ï¿½Ø¼ï¿½ ï¿½ï¿½ï¿½ï¿½.
 
-    public void SaveHighestScore() //°ÔÀÓ ³¡³µÀ» ¶§ ÃÖ°í ±â·Ï °»½Å°¡´ÉÇÏ°Ô ¸¸µé¾î¾ßÇÔ.
+    public void SaveHighestScore() //ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½Ö°ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Å°ï¿½ï¿½ï¿½ï¿½Ï°ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½.
     {
         if(currentScore > highestScore)
         {

@@ -1691,6 +1691,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   txt_s: {fileID: 377117043}
   txt_t: {fileID: 959488058}
+  upgradePrefabs:
+  - {fileID: 4629254344917785892, guid: c324c0dd81dd7234db2bd95601ef406f, type: 3}
+  - {fileID: 1462873531783496906, guid: 31f39d83d78d9f94e897fb3d27c29b3d, type: 3}
+  - {fileID: 1765243237581088004, guid: 9fff507fef3c92f489c3cd1557fec207, type: 3}
+  - {fileID: 5756063702233885241, guid: e8fe509c6120a0f4786e590630c407b5, type: 3}
+  - {fileID: 4297051561337349494, guid: 0a2d1a71b4717254fbe79225b821c2c5, type: 3}
+  - {fileID: 4734855116648081625, guid: 8a6b16c96433f8a4cb74e2444d714c2d, type: 3}
+  - {fileID: 4997132204291090055, guid: 45cb436a3711ff241ae61fdbd29173b1, type: 3}
   Userscore: 0
 --- !u!4 &1872699563
 Transform:
