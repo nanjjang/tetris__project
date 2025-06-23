@@ -49,10 +49,20 @@ public class spawnertetris : MonoBehaviour
         int idx = bagQueue.Dequeue();
         currentPrefab = tetrominoes[idx];
         currentInstance = Instantiate(currentPrefab, spawnPoint.position, Quaternion.identity);
-        currentInstance.GetComponent<TetrominoMovement>().enabled = true;
+        TetrominoMovement movement = currentInstance.GetComponent<TetrominoMovement>();
+        movement.enabled = true;
+
+        // ▶ 게임 오버 판단
+        if (!movement.ValidMove())
+        {
+            Debug.Log("Game Over!");
+            GameManager.Instance.GameOver(); // 원하는 게임오버 처리 호출
+            Destroy(currentInstance);        // 블록 제거
+        }
 
         canHold = true; // 새로운 블록이 소환되면 다시 홀드 가능
     }
+
 
     // 하드드롭이나 라인이 지워진 뒤 호출됨
     public void NewTetris()
