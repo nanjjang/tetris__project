@@ -34,7 +34,7 @@ public class GameManager : MonoBehaviour
         {
             highestScore = PlayerPrefs.GetFloat("Score");
             
-            if(SceneManager.GetActiveScene().name == "Menu" )
+            if(SceneManager.GetActiveScene().name == "Menu")
                 txt_h.text = highestScore.ToString("F1");
         }
         else
@@ -48,7 +48,7 @@ public class GameManager : MonoBehaviour
 
     void Update()
     {
-        if(SceneManager.GetActiveScene().name == "URP2DSceneTemplate")
+        if(SceneManager.GetActiveScene().name != "Menu")
         {
             time += Time.deltaTime;
             txt_t.text = time.ToString("F2"); // Display to two decimal places.
@@ -102,6 +102,7 @@ public class GameManager : MonoBehaviour
     {
         SaveHighestScore(); //최고점수 저장
         gameOver.SetActive(true); //게임오버 UI 활성화
+        txt_ms.text = Userscore.ToString("F1"); //메뉴에서 점수 표시용
     }
     //------save data-------//
 
