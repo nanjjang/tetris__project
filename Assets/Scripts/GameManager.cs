@@ -5,10 +5,14 @@ using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
-    public static GameManager Instance; // �̱���
+    public static GameManager Instance;
+
+    public GameObject gameOver; //게임오버 UI 오브젝트
 
     public TextMeshProUGUI txt_s;
+    public TextMeshProUGUI txt_h; //최고점수 표시용
     public TextMeshProUGUI txt_t;
+    public TextMeshProUGUI txt_ms; //in menu score
 
     [Header("1~7단계 업그레이드 프리팹")]
     public GameObject[] upgradePrefabs = new GameObject[7];
@@ -18,8 +22,6 @@ public class GameManager : MonoBehaviour
 
     private float time = 0f;
     float highestScore = 0f;
-    float currentScore = 0f;
-
     public float Userscore = 0f;
 
     void Awake()
@@ -28,14 +30,20 @@ public class GameManager : MonoBehaviour
         if (Instance == null) Instance = this;
         else Destroy(gameObject);
 
-        //if(PlayerPrefs.HasKey("Score"))
-        //{
-        //    highestScore = PlayerPrefs.GetFloat("Score");
-        //}
-        //else
-        //{
-        //    highestScore = 0f;
-        //}
+        if (PlayerPrefs.HasKey("Score"))
+        {
+            highestScore = PlayerPrefs.GetFloat("Score");
+            
+            if(SceneManager.GetActiveScene().name == "Menu" )
+                txt_h.text = highestScore.ToString("F1");
+        }
+        else
+        {
+            highestScore = 0f;
+            txt_h.text = "0.0";
+            if (SceneManager.GetActiveScene().name == "Menu")
+                txt_h.text = highestScore.ToString("F1");
+        }
     }
 
     void Update()
@@ -44,9 +52,16 @@ public class GameManager : MonoBehaviour
         {
             time += Time.deltaTime;
             txt_t.text = time.ToString("F2"); // Display to two decimal places.
+            txt_s.text = Userscore.ToString("F1");
         }
+    }
 
-        txt_s.text = Userscore.ToString("F1");
+    public void Init()
+    {
+        // 게임 초기화 로직 (필요시 추가)
+        Userscore = 0f;
+        currentLevel = 0;
+        time = 0f;
     }
 
     public void Plus()
@@ -72,19 +87,29 @@ public class GameManager : MonoBehaviour
         spawner.ReplaceTetromino(tetrominoIndex, newPrefab);
 
         Debug.Log($"레벨업! { (tetrominoIndex+1)*1000 }점 달성: Tetromino[{tetrominoIndex}]을 새 프리팹으로 교체");
-    }   
+    } 
 
-    void LevelUp()
+    public void RestartGame() //게임 재시작
     {
-
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name); //현재 씬을 다시 로드
+        gameOver.SetActive(false); //게임오버 UI 비활성화
+        time = 0f; //시간 초기화
+        Userscore = 0f; //점수 초기화
+        currentLevel = 0; //레벨 초기화
     }
-    //------save data-------//    �ð� ����� ����Ⱓ�̱⵵ �ؼ� ����.
 
-    public void SaveHighestScore() //���� ������ �� �ְ� ��� ���Ű����ϰ� ��������.
+    public void GameOver() //게임오버시 호출
     {
-        if(currentScore > highestScore)
+        SaveHighestScore(); //최고점수 저장
+        gameOver.SetActive(true); //게임오버 UI 활성화
+    }
+    //------save data-------//
+
+    void SaveHighestScore()
+    {
+        if(Userscore > highestScore)
         {
-            highestScore = currentScore;
+            highestScore = Userscore;
             
         }
         PlayerPrefs.SetFloat("Score", highestScore);

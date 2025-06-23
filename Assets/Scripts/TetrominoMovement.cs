@@ -99,7 +99,7 @@ public class TetrominoMovement : MonoBehaviour
         CheckForLines();                                 // 라인 체크 및 제거
     }
 
-    bool ValidMove()
+    public bool ValidMove()
     {
         foreach (Transform child in transform)
         {
