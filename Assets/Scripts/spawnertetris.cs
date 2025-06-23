@@ -2,9 +2,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
+using UnityEngine.UI;
 
 public class spawnertetris : MonoBehaviour
 {
+    [Header("UI")]
+    public Image holdImage;                 // UI에 표시될 이미지
+    public Sprite[] tetrominoSprites;      // 프리팹과 대응되는 스프라이트 (인덱스 순서 동일)
     [Header("블록 프리팹 목록")]
     public GameObject[] tetrominoes;
     [Header("소환 위치")]
@@ -102,7 +106,19 @@ public class spawnertetris : MonoBehaviour
 
     void UpdateHoldDisplay()
     {
-        // 보관 UI(이미지) 갱신 로직 넣기
+        if (holdPrefab == null || holdImage == null || tetrominoSprites == null) return;
+
+        for (int i = 0; i < tetrominoes.Length; i++)
+        {
+            if (holdPrefab.name.Contains(tetrominoes[i].name)) // 이름 기준으로 찾음 (프리팹과 이름 일치)
+            {
+                holdImage.sprite = tetrominoSprites[i];
+                holdImage.enabled = true;
+                return;
+            }
+        }
+
+        holdImage.enabled = false; // 매칭되는게 없으면 숨김
     }
 
     public void ReplaceTetromino(int index, GameObject newPrefab) 
